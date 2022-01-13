@@ -1,0 +1,36 @@
+#
+# TODO: Install pgAdmin
+#
+# PostgreSQL 13.5
+# https://www.enterprisedb.com/download-postgresql-binaries
+# https://sbp.enterprisedb.com/getfile.jsp?fileid=1257893
+# 
+
+FROM mcr.microsoft.com/windows/servercore:20H2-amd64 AS install
+
+ADD https://sbp.enterprisedb.com/getfile.jsp?fileid=1257893 /PgInstall.zip
+
+# powershell Expand-Archive -Path PgInstall.zip -DestinationPath postgres; \
+
+RUN \
+    powershell Expand-Archive -Path PgInstall.zip -DestinationPath ./postgres ; \
+    powershell Remove-Item -Path PgInstall.zip
+
+FROM mcr.microsoft.com/windows/nanoserver:20H2-amd64
+
+COPY --from=install ./postgres /
+
+COPY ./Start.bat /Start.bat
+
+ENV \
+    SUPERUSER=postgres\
+    SUPERUSERPWD=postgres\
+    PGPORT=5432
+
+WORKDIR /data
+
+EXPOSE 5432
+
+# Está dando erro ao chamar o postgres, seria melhor instalar como serviço?
+
+ENTRYPOINT C:\Start.bat
