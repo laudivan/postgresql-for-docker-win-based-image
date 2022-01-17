@@ -1,3 +1,5 @@
+# https://sbp.enterprisedb.com/getfile.jsp?fileid=1257892
+
 FROM mcr.microsoft.com/windows/servercore:20H2-amd64 AS install
 
 ADD https://sbp.enterprisedb.com/getfile.jsp?fileid=1257893 /PgInstall.zip
@@ -11,23 +13,24 @@ RUN \
     Remove-Item -Path PgInstall.zip ; \
     Get-ChildItem -Recurse -Include cab1.cab -Path 'C:\ProgramData\Package Cache' | %{expand.exe -F:* $_ .\pgsql\lib}
 
-FROM mcr.microsoft.com/windows/nanoserver:20H2-amd64
-
-COPY --from=install /pgsql /pgsql
+# It didn't work with nanoserver :-(
+# FROM mcr.microsoft.com/windows/nanoserver:20H2-amd64
+# COPY --from=install /pgsql /pgsql
 
 COPY ./Start.bat /Start.bat
 
 ENV PGPORT=5432\
-    PGDATA=C:\\Data\
+    LOCALE=C\
+    ENCODING=UTF8\
     SUPERUSER=postgres\
     SUPERUSERPWD=postgres
 
 EXPOSE 5432
 
-WORKDIR /Data
+WORKDIR /data
 
 SHELL [ "CMD" ]
 
 WORKDIR /
 
-CMD C:\Start.bat
+ENTRYPOINT [ "C:\Start.bat" ] 
