@@ -6,7 +6,7 @@ ADD https://aka.ms/vs/17/release/vc_redist.x64.exe /vc_redist.x64.exe
 SHELL [ "powershell" ]
 
 RUN \
-    & .\vc_redis.x64.exe /install /quiet /norestart ; \
+    & .\vc_redist.x64.exe /install /quiet /norestart ; \
     Expand-Archive -Path PgInstall.zip -DestinationPath . ; \
     Remove-Item -Path PgInstall.zip ; \
     Get-ChildItem -Recurse -Include cab1.cab -Path 'C:\ProgramData\Package Cache' | %{expand.exe -F:* $_ .\pgsql\lib}
